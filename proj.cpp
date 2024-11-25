@@ -4,7 +4,8 @@
 #include <cmath>
 #include <chrono>
 #include <iomanip>
-#include <string>
+#include <cstdlib> // For rand() and srand()
+#include <ctime>   // For time()
 
 using namespace std;
 
@@ -131,6 +132,39 @@ bool greedySearch(const vector<vector<int> >& grid, const Point& start, const Po
     return false; // No path found
 }
 
+// Display Grid
+void displayGrid(const vector<vector<int> >& grid) {
+    for (size_t i = 0; i < grid.size(); ++i) {
+        for (size_t j = 0; j < grid[i].size(); ++j) {
+            cout << (grid[i][j] ? '|' : ' ') << ' ';
+        }
+        cout << endl;
+    }
+}
+
+// Generate Random Maze-Like Grid
+vector<vector<int> > generateRandomGrid(int rows, int cols, int obstacleDensity, Point start, Point goal) {
+    vector<vector<int> > grid(rows, vector<int>(cols, 0));
+
+    // Seed random number generator
+    srand(time(0));
+
+    // Randomly place obstacles
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            if (rand() % 100 < obstacleDensity) {
+                grid[i][j] = 1; // Place an obstacle
+            }
+        }
+    }
+
+    // Ensure start and goal are open
+    grid[start.x][start.y] = 0;
+    grid[goal.x][goal.y] = 0;
+
+    return grid;
+}
+
 // Compare Heuristics and Algorithms
 void compareAlgorithms(const vector<vector<int> >& grid, const Point& start, const Point& goal) {
     HeuristicConfig heuristics[3] = {
@@ -168,32 +202,23 @@ void compareAlgorithms(const vector<vector<int> >& grid, const Point& start, con
 }
 
 int main() {
-    // Larger Grid Structures
-    vector<vector<int> > grid1(10, vector<int>(10, 0));
-    for (int i = 2; i <= 7; ++i) grid1[i][5] = 1;
+    Point start1 = {0, 0}, goal1 = {29, 49};
+    Point start2 = {0, 0}, goal2 = {39, 59};
 
-    vector<vector<int> > grid2(15, vector<int>(15, 0));
-    for (int i = 0; i < 15; ++i) grid2[7][i] = 1;
-    for (int j = 5; j < 10; ++j) grid2[j][7] = 1;
+    // Generate two random grids
+    vector<vector<int> > randomGrid1 = generateRandomGrid(30, 50, 30, start1, goal1); // 30% obstacles
+    vector<vector<int> > randomGrid2 = generateRandomGrid(40, 60, 40, start2, goal2); // 40% obstacles
 
-    vector<vector<int> > grid3(20, vector<int>(20, 0));
-    for (int i = 5; i < 15; ++i) grid3[i][10] = 1;
-    for (int j = 8; j < 12; ++j) grid3[10][j] = 1;
+    cout << "Random Maze-Like Grid 1:" << endl;
+    displayGrid(randomGrid1);
+    compareAlgorithms(randomGrid1, start1, goal1);
 
-    Point start1 = {0, 0}, goal1 = {9, 9};
-    Point start2 = {0, 0}, goal2 = {14, 14};
-    Point start3 = {0, 0}, goal3 = {19, 19};
-
-    cout << "Grid 1 Results:" << endl;
-    compareAlgorithms(grid1, start1, goal1);
-
-    cout << "\nGrid 2 Results:" << endl;
-    compareAlgorithms(grid2, start2, goal2);
-
-    cout << "\nGrid 3 Results:" << endl;
-    compareAlgorithms(grid3, start3, goal3);
+    cout << "\nRandom Maze-Like Grid 2:" << endl;
+    displayGrid(randomGrid2);
+    compareAlgorithms(randomGrid2, start2, goal2);
 
     return 0;
 }
+
 
 
