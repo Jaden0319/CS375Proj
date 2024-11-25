@@ -38,7 +38,7 @@ double euclideanDistance(const Point& a, const Point& b, double D, double /*unus
     return D * sqrt(dx * dx + dy * dy);
 }
 
-// Data structure to replace std::tuple
+// Data structure for heuristics
 struct HeuristicConfig {
     string name;
     double (*heuristicFunc)(const Point&, const Point&, double, double);
@@ -89,8 +89,50 @@ bool aStarSearch(const vector<vector<int> >& grid, const Point& start, const Poi
     return false; // No path found
 }
 
-// Compare Heuristics
-void compareHeuristics(const vector<vector<int> >& grid, const Point& start, const Point& goal) {
+// Greedy Best-First Search Function
+bool greedySearch(const vector<vector<int> >& grid, const Point& start, const Point& goal,
+                  double (*heuristicFunc)(const Point&, const Point&, double, double),
+                  double D, double D2, int& expandedNodes) {
+    int rows = grid.size();
+    int cols = grid[0].size();
+    vector<vector<bool> > visited(rows, vector<bool>(cols, false));
+    priority_queue<Node> pq;
+
+    pq.push((Node){start, 0, heuristicFunc(start, goal, D, D2), heuristicFunc(start, goal, D, D2)});
+    expandedNodes = 0;
+
+    while (!pq.empty()) {
+        Node current = pq.top();
+        pq.pop();
+
+        if (current.point.x == goal.x && current.point.y == goal.y) {
+            return true; // Goal found
+        }
+
+        if (visited[current.point.x][current.point.y]) continue;
+        visited[current.point.x][current.point.y] = true;
+        expandedNodes++;
+
+        // Movement directions
+        Point directions[] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}, {1, 1}, {-1, -1}, {1, -1}, {-1, 1}};
+        for (int i = 0; i < 8; ++i) {
+            Point dir = directions[i];
+            int newX = current.point.x + dir.x;
+            int newY = current.point.y + dir.y;
+
+            if (newX >= 0 && newX < rows && newY >= 0 && newY < cols && grid[newX][newY] == 0) {
+                Point next = {newX, newY};
+                double heuristicCost = heuristicFunc(next, goal, D, D2);
+                pq.push((Node){next, 0, heuristicCost, heuristicCost}); // Greedy uses only the heuristic
+            }
+        }
+    }
+
+    return false; // No path found
+}
+
+// Compare Heuristics and Algorithms
+void compareAlgorithms(const vector<vector<int> >& grid, const Point& start, const Point& goal) {
     HeuristicConfig heuristics[3] = {
         {"Manhattan", manhattanDistance, 1.0, 1.0},
         {"Diagonal", diagonalDistance, 1.0, sqrt(2)},
@@ -99,18 +141,28 @@ void compareHeuristics(const vector<vector<int> >& grid, const Point& start, con
 
     for (int i = 0; i < 3; ++i) {
         HeuristicConfig h = heuristics[i];
-        int expandedNodes = 0;
+        int expandedNodesAStar = 0, expandedNodesGreedy = 0;
 
-        chrono::high_resolution_clock::time_point startTime = chrono::high_resolution_clock::now();
-        bool found = aStarSearch(grid, start, goal, h.heuristicFunc, h.D, h.D2, expandedNodes);
-        chrono::high_resolution_clock::time_point endTime = chrono::high_resolution_clock::now();
+        chrono::high_resolution_clock::time_point startTimeAStar = chrono::high_resolution_clock::now();
+        bool foundAStar = aStarSearch(grid, start, goal, h.heuristicFunc, h.D, h.D2, expandedNodesAStar);
+        chrono::high_resolution_clock::time_point endTimeAStar = chrono::high_resolution_clock::now();
 
-        chrono::duration<double, milli> elapsed = endTime - startTime;
+        chrono::high_resolution_clock::time_point startTimeGreedy = chrono::high_resolution_clock::now();
+        bool foundGreedy = greedySearch(grid, start, goal, h.heuristicFunc, h.D, h.D2, expandedNodesGreedy);
+        chrono::high_resolution_clock::time_point endTimeGreedy = chrono::high_resolution_clock::now();
+
+        chrono::duration<double, milli> elapsedAStar = endTimeAStar - startTimeAStar;
+        chrono::duration<double, milli> elapsedGreedy = endTimeGreedy - startTimeGreedy;
 
         cout << h.name << " Heuristic:" << endl;
-        cout << "  Path Found: " << (found ? "Yes" : "No") << endl;
-        cout << "  Nodes Expanded: " << expandedNodes << endl;
-        cout << "  Time Taken: " << fixed << setprecision(2) << elapsed.count() << " ms" << endl;
+        cout << "  A* Algorithm:" << endl;
+        cout << "    Path Found: " << (foundAStar ? "Yes" : "No") << endl;
+        cout << "    Nodes Expanded: " << expandedNodesAStar << endl;
+        cout << "    Time Taken: " << fixed << setprecision(2) << elapsedAStar.count() << " ms" << endl;
+        cout << "  Greedy Algorithm:" << endl;
+        cout << "    Path Found: " << (foundGreedy ? "Yes" : "No") << endl;
+        cout << "    Nodes Expanded: " << expandedNodesGreedy << endl;
+        cout << "    Time Taken: " << fixed << setprecision(2) << elapsedGreedy.count() << " ms" << endl;
         cout << "---------------------------------------" << endl;
     }
 }
@@ -133,14 +185,15 @@ int main() {
     Point start3 = {0, 0}, goal3 = {19, 19};
 
     cout << "Grid 1 Results:" << endl;
-    compareHeuristics(grid1, start1, goal1);
+    compareAlgorithms(grid1, start1, goal1);
 
     cout << "\nGrid 2 Results:" << endl;
-    compareHeuristics(grid2, start2, goal2);
+    compareAlgorithms(grid2, start2, goal2);
 
     cout << "\nGrid 3 Results:" << endl;
-    compareHeuristics(grid3, start3, goal3);
+    compareAlgorithms(grid3, start3, goal3);
 
     return 0;
 }
+
 
