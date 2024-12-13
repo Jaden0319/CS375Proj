@@ -24,16 +24,14 @@ struct cell {
     double f, g, h;
 };
 
-bool isValid(int row, int col)
-{
+bool isValid(int row, int col) {
   
     return (row >= 0) && (row < ROW) && (col >= 0)
            && (col < COL);
 }
 
 
-bool isUnBlocked(int grid[][COL], int row, int col)
-{
+bool isUnBlocked(int grid[][COL], int row, int col) {
     if (grid[row][col] == 1)
         return (true);
     else
@@ -41,18 +39,16 @@ bool isUnBlocked(int grid[][COL], int row, int col)
 }
 
 
-bool isDestination(int row, int col, Pair dest)
-{
+bool isDestination(int row, int col, Pair dest) {
     if (row == dest.first && col == dest.second)
         return (true);
     else
         return (false);
 }
 
-double calculateHValue(int row, int col, Pair dest, int h)
-{
+double calculateHValue(int row, int col, Pair dest, int h) {
     
-    if(h == 0) { 
+    if(h == 0) {  //Euclidean
         return ((double)sqrt(
         (row - dest.first) * (row - dest.first)
         + (col - dest.second) * (col - dest.second)));
@@ -70,8 +66,7 @@ double calculateHValue(int row, int col, Pair dest, int h)
     
 }
 
-void tracePath(cell cellDetails[][COL], Pair dest)
-{
+void tracePath(cell cellDetails[][COL], Pair dest) {
     printf("\nThe Path is ");
     int row = dest.first;
     int col = dest.second;
@@ -97,8 +92,7 @@ void tracePath(cell cellDetails[][COL], Pair dest)
     return;
 }
 
-void aStarSearch(int grid[][COL], Pair src, Pair dest, int hvalue)
-{
+void aStarSearch(int grid[][COL], Pair src, Pair dest, int hvalue) {
     if (isValid(src.first, src.second) == false) {
         printf("Source is invalid\n");
         return;
@@ -156,16 +150,12 @@ void aStarSearch(int grid[][COL], Pair src, Pair dest, int hvalue)
 
     while (!openList.empty()) {
         pPair p = *openList.begin();
-
         openList.erase(openList.begin());
 
-        
         i = p.second.first;
         j = p.second.second;
         closedList[i][j] = true;
         nodesExpanded++;
-       
-
        
         double gNew, hNew, fNew;
         
@@ -174,8 +164,8 @@ void aStarSearch(int grid[][COL], Pair src, Pair dest, int hvalue)
             if (isDestination(i - 1, j, dest) == true) {
                 cellDetails[i - 1][j].parent_i = i;
                 cellDetails[i - 1][j].parent_j = j;
-                printf("The destination cell is found\n");
-                tracePath(cellDetails, dest);
+                //printf("The destination cell is found\n");
+                //tracePath(cellDetails, dest);
                 foundDest = true;
                 return;
             }
@@ -192,8 +182,6 @@ void aStarSearch(int grid[][COL], Pair src, Pair dest, int hvalue)
                     || cellDetails[i - 1][j].f > fNew) {
                     openList.insert(make_pair(
                         fNew, make_pair(i - 1, j)));
-
-                    
                     cellDetails[i - 1][j].f = fNew;
                     cellDetails[i - 1][j].g = gNew;
                     cellDetails[i - 1][j].h = hNew;
@@ -203,15 +191,14 @@ void aStarSearch(int grid[][COL], Pair src, Pair dest, int hvalue)
             }
         }
 
-        
         if (isValid(i + 1, j) == true) {
             
             if (isDestination(i + 1, j, dest) == true) {
                 // Set the Parent of the destination cell
                 cellDetails[i + 1][j].parent_i = i;
                 cellDetails[i + 1][j].parent_j = j;
-                printf("The destination cell is found\n");
-                tracePath(cellDetails, dest);
+                //printf("The destination cell is found\n");
+                //tracePath(cellDetails, dest);
                 foundDest = true;
                 return;
             }
@@ -244,8 +231,8 @@ void aStarSearch(int grid[][COL], Pair src, Pair dest, int hvalue)
             
                 cellDetails[i][j + 1].parent_i = i;
                 cellDetails[i][j + 1].parent_j = j;
-                printf("The destination cell is found\n");
-                tracePath(cellDetails, dest);
+                //printf("The destination cell is found\n");
+                //tracePath(cellDetails, dest);
                 foundDest = true;
                 return;
             }
@@ -280,8 +267,8 @@ void aStarSearch(int grid[][COL], Pair src, Pair dest, int hvalue)
                 
                 cellDetails[i][j - 1].parent_i = i;
                 cellDetails[i][j - 1].parent_j = j;
-                printf("The destination cell is found\n");
-                tracePath(cellDetails, dest);
+                //printf("The destination cell is found\n");
+                //tracePath(cellDetails, dest);
                 foundDest = true;
                 return;
             }
@@ -318,8 +305,8 @@ void aStarSearch(int grid[][COL], Pair src, Pair dest, int hvalue)
             if (isDestination(i - 1, j + 1, dest) == true) {
                 cellDetails[i - 1][j + 1].parent_i = i;
                 cellDetails[i - 1][j + 1].parent_j = j;
-                printf("The destination cell is found\n");
-                tracePath(cellDetails, dest);
+                //printf("The destination cell is found\n");
+                //tracePath(cellDetails, dest);
                 foundDest = true;
                 return;
             }
@@ -355,13 +342,12 @@ void aStarSearch(int grid[][COL], Pair src, Pair dest, int hvalue)
                 
                 cellDetails[i - 1][j - 1].parent_i = i;
                 cellDetails[i - 1][j - 1].parent_j = j;
-                printf("The destination cell is found\n");
-                tracePath(cellDetails, dest);
+                //printf("The destination cell is found\n");
+                //tracePath(cellDetails, dest);
                 foundDest = true;
                 return;
             }
 
-            
             else if (closedList[i - 1][j - 1] == false
                      && isUnBlocked(grid, i - 1, j - 1)
                             == true) {
@@ -384,15 +370,14 @@ void aStarSearch(int grid[][COL], Pair src, Pair dest, int hvalue)
             }
         }
 
-        
         if (isValid(i + 1, j + 1) == true) {
             
             if (isDestination(i + 1, j + 1, dest) == true) {
                 
                 cellDetails[i + 1][j + 1].parent_i = i;
                 cellDetails[i + 1][j + 1].parent_j = j;
-                printf("The destination cell is found\n");
-                tracePath(cellDetails, dest);
+                //printf("The destination cell is found\n");
+                //tracePath(cellDetails, dest);
                 foundDest = true;
                 return;
             }
@@ -426,8 +411,8 @@ void aStarSearch(int grid[][COL], Pair src, Pair dest, int hvalue)
           
                 cellDetails[i + 1][j - 1].parent_i = i;
                 cellDetails[i + 1][j - 1].parent_j = j;
-                printf("The destination cell is found\n");
-                tracePath(cellDetails, dest);
+                //printf("The destination cell is found\n");
+                //tracePath(cellDetails, dest);
                 foundDest = true;
                 return;
             }
@@ -478,7 +463,7 @@ void displayGrid(int grid[][COL]) {
 }
 
 int main() {
-Pair src = make_pair(8, 0);
+    Pair src = make_pair(8, 0);
     Pair dest = make_pair(0, 9);
 
     int grid1[ROW][COL] = { //no diagonal paths, Good test
@@ -507,19 +492,86 @@ Pair src = make_pair(8, 0);
     int (*grids[2])[COL] = {grid1, grid2};
     const char* heuristics[] = {"Euclidean", "Manhattan", "Diagonal"};
 
-    for (int g = 0; g < 2; g++) {
-        cout << "\n=====================================\n";
-        cout << "Testing on Grid " << g + 1 << ":\n";
-        displayGrid(grids[g]);
-        for (int h = 0; h < 3; h++) {
-            cout << "\n-------------------------------------\n";
-            cout << "Using " << heuristics[h] << " Heuristic:\n";
-            auto start = chrono::high_resolution_clock::now();
-            aStarSearch(grids[g], src, dest, h);
-            auto end = chrono::high_resolution_clock::now();
-            auto elapsed = chrono::duration_cast<chrono::nanoseconds>(end - start);
-            cout << "\nRunning Time: " << elapsed.count() << " ns\n";
+    long int avgE_Graph_One = 0;
+    long int avgM_Graph_One = 0;
+    long int avgD_Graph_One = 0;
+    long int avgE_Graph_Two = 0;
+    long int avgM_Graph_Two = 0;
+    long int avgD_Graph_Two = 0;
+
+
+
+    for(int i = 0; i < 1000; i++) {
+
+        for (int g = 0; g < 2; g++) {
+
+            if(i == 1) {
+                cout << "\n=====================================\n";
+                cout << "Testing on Grid " << g + 1 << ":\n";
+                displayGrid(grids[g]);
+            }
+           
+
+                for (int h = 0; h < 3; h++) {
+
+                    
+                    if (i == 1) {
+                        cout << "\n-------------------------------------\n";
+                        cout << "Using " << heuristics[h] << " Heuristic:\n";
+                    }
+                    
+                    auto start = chrono::high_resolution_clock::now();
+                    aStarSearch(grids[g], src, dest, h);
+                    auto end = chrono::high_resolution_clock::now();
+                    auto elapsed = chrono::duration_cast<chrono::nanoseconds>(end - start);
+                    if (i == 1) {
+                        cout << "\nRunning Time: " << elapsed.count() << " ns\n";
+                    }
+                    
+                    
+                    if(g == 0) {
+                        if(heuristics[h] == "Euclidean") {
+                            avgE_Graph_One += elapsed.count();
+
+                        }
+                        else if(heuristics[h] == "Manhattan") {
+                            avgM_Graph_One += elapsed.count();
+
+                        }
+                        else {
+                            avgD_Graph_One += elapsed.count();
+
+                        }
+                    }
+                    else if(g == 1) {
+                        if(heuristics[h] == "Euclidean") {
+                            avgE_Graph_Two += elapsed.count();
+
+                        }
+                        else if(heuristics[h] == "Manhattan") {
+                            avgM_Graph_Two += elapsed.count();
+
+                        }
+                        else {
+                            avgD_Graph_Two += elapsed.count();
+                        }
+                    }
+            }
         }
     }
+
+    cout << "\nGrid One Average Running Times in ns for 1000 runs: \n";
+    cout << "Euclidean: " << avgE_Graph_One / 1000.0 << " ns \n";
+    cout << "Manhattan: " << avgM_Graph_One / 1000.0 << " ns \n";
+    cout << "Diagonal: " << avgD_Graph_One / 1000.0 << " ns \n";
+    cout << "--------------------------------\n";
+     cout << "Grid Two Average Running Times in ns for 1000 runs: \n";
+    cout << "Euclidean: " << avgE_Graph_Two / 1000.0 << " ns \n";
+    cout << "Manhattan: " << avgM_Graph_Two / 1000.0 << " ns \n";
+    cout << "Diagonal: " << avgD_Graph_Two / 1000.0 << " ns \n";
+    cout << "--------------------------------\n";
+
+
     return 0;
 }
+
